@@ -8,13 +8,13 @@ I often have to debug all types of HTTP requests.  Standard requests coming from
 This script will echo back everything it receives, including request metadata, all headers, and the request body. 
 ## Usage
 Standard usage is simply to invoke from curl or a browser. You will get a JSON response. 
- curl "http://yourserver/somepath/somefile?somequerystring"
+` curl "http://yourserver/somepath/somefile?somequerystring"`
 
 You can add the "x-echo-type" header to have a text response instead of a json response. 
- curl "http://yourserver/somepath/somefile?somequerystring"  -H "x-echo-type: text" 
+` curl "http://yourserver/somepath/somefile?somequerystring"  -H "x-echo-type: text" `
 
 Alternatively, add a "x-echo-type=text" query string parameter - it is case sensitive. 
- curl "http://yourserver/somepath/somefile?somequerystring&x-echo-type=text" 
+` curl "http://yourserver/somepath/somefile?somequerystring&x-echo-type=text" `
 
 ## Installation 
 Drop the echo.php file and the .htaccess file into a folder on an Apache server. 
