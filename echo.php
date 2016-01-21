@@ -32,7 +32,7 @@ if ($json) {
 	$time = time(); 
 	$response["meta"]["description"]='Globaldots echo service';
 	$response["meta"]["author"]='Shalom Carmel 2016';
-	$response["meta"]["version"]='1.0';
+	$response["meta"]["version"]='1.3';
 	$response["request"]["timestamp"]=$time;
 	$response["request"]["date"]=date('Y-m-d h:i:s',$time);
 	$response["request"]["server"]= $_SERVER["SERVER_NAME"] ;
