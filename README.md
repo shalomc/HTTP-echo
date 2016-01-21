@@ -27,7 +27,7 @@ Drop the echo.php file and the .htaccess file into a folder on an Apache server.
 * Add WURFL device data to the output
 
 ## License
-Copyright 2011 Scott Merrill
+Copyright 2016 Shalom Carmel
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
