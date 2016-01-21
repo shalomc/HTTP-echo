@@ -1,5 +1,3 @@
 Options +FollowSymlinks
 RewriteEngine on
 RewriteRule (.*) echo.php
-Header set Cache-Control "private, no-cache"
-Header set Access-Control-Allow-Origin "*"

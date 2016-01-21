@@ -6,11 +6,23 @@ A simple PHP script to echo back the request coming to the server.
 I often have to debug all types of HTTP requests.  Standard requests coming from a browser, API calls, AJAX requests, and CDN requests to the origin. 
 
 This script will echo back everything it receives, including request metadata, all headers, and the request body. 
-## Usage
+## Simple Usage
 Standard usage is simply to invoke from curl or a browser. You will get a JSON response. 
 
 ` curl "http://yourserver/somepath/somefile?somequerystring"`
 
+## Options
+
+###Find and output Geo IP data
+Add the "x-echo-geoip" header to see the geo information of the client based on the IP address. It is very handy when debugging CDN connections to the origin. 
+
+` curl "http://yourserver/somepath/somefile?somequerystring"  -H "x-echo-geoip: on" `
+
+Alternatively, add a "x-echo-geoip=on" query string parameter - it is case sensitive. 
+
+` curl "http://yourserver/somepath/somefile?somequerystring&x-echo-geoip=on" `
+
+###Output as text
 You can add the "x-echo-type" header to have a text response instead of a json response. 
 
 ` curl "http://yourserver/somepath/somefile?somequerystring"  -H "x-echo-type: text" `
@@ -18,6 +30,7 @@ You can add the "x-echo-type" header to have a text response instead of a json r
 Alternatively, add a "x-echo-type=text" query string parameter - it is case sensitive. 
 
 ` curl "http://yourserver/somepath/somefile?somequerystring&x-echo-type=text" `
+
 ## Example output 
 Debugging Akamai connections to my server 
 ```
