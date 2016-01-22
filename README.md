@@ -75,7 +75,7 @@ Debugging Akamai connections to my server
 }
 ```
 ## Installation 
-Drop the echo.php file and the .htaccess file into a folder on an Apache server. 
+Just drop everything into a folder on your web server. As simple as that.  
 
 ## To do
 * Add Nginx support
