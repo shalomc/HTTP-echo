@@ -36,7 +36,7 @@ Debugging Akamai connections to my server
 ```
 {
     "meta": {
-        "description": "Globaldots echo service",
+        "description": "HTTP echo service",
         "author": "Shalom Carmel 2016",
         "version": "1.0"
     },
