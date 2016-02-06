@@ -14,7 +14,15 @@ Standard usage is simply to invoke from curl or a browser. You will get a JSON r
 ## Options
 
 ###Find and output Geo IP data
-Add the "x-echo-geoip" header to see the geo information of the client based on the IP address. It is very handy when debugging CDN connections to the origin. 
+The geoip information is fetched in real time from http://www.geoplugin.net/
+**********************************************************
+****           Use with caution.                      ****
+**********************************************************
+
+Set the config file to include this line to see the geo information of the client based on the IP address. It is very handy when debugging CDN connections to the origin. 
+` resolve-geoip=true `
+
+Alternatively, add the "x-echo-geoip" header to the request.
 
 ` curl "http://yourserver/somepath/somefile?somequerystring"  -H "x-echo-geoip: on" `
 
@@ -23,7 +31,13 @@ Alternatively, add a "x-echo-geoip=on" query string parameter - it is case sensi
 ` curl "http://yourserver/somepath/somefile?somequerystring&x-echo-geoip=on" `
 
 ###Output as text
-You can add the "x-echo-type" header to have a text response instead of a json response. 
+By default the results are returned as JSON. 
+
+You can add this line to the config file to have a text response instead of a json response. 
+
+` response-type=text `
+
+Alternatively, add the "x-echo-type" header.
 
 ` curl "http://yourserver/somepath/somefile?somequerystring"  -H "x-echo-type: text" `
 
@@ -71,15 +85,15 @@ Debugging Akamai connections to my server
         "X-Akamai-Staging": "EdgeSuite",
         "X-Forwarded-For": "185.15.80.161"
     },
-    "body": ""
+    "body": null
 }
 ```
 ## Installation 
 Just drop everything into a folder on your web server. As simple as that.  
+Use composer to verify that you have the latest Mobile detect library. 
 
 ## To do
 * Add Nginx support
-* Add WURFL device data to the output
 
 ## License
 Copyright 2016 Shalom Carmel

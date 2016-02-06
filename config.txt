@@ -1,0 +1,3 @@
+
+response-type=json
+resolve-geoip=true
