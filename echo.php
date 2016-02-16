@@ -15,7 +15,7 @@
   *
 **/
 
-$version = 1.9;
+$version = 1.9.1;
 
 require_once('./lib/GeoIP/GeoIP.php');
 
@@ -100,8 +100,18 @@ if ($json) {
 	
     $HTTP_body = file_get_contents('php://input');
 	
-	$response["body"]= empty($HTTP_body) ? null : $HTTP_body; 
-
+	if ( strtolower($headers["Content-Type"]) == "application/json") {
+		$json_body = json_decode($HTTP_body);
+		if (is_null($json_body)) {
+		   $response["body"]= empty($HTTP_body) ? null : $HTTP_body; 
+		   $response["meta"]["error"]="Invalid JSON Payload";
+		} else {
+			$response["body"] = $json_body;
+		}
+	} else {  // non json payload
+		$response["body"]= empty($HTTP_body) ? null : $HTTP_body; 
+	}
+	
 	// geoip integration
 	if ($geoip) {
 		$response["geoip_info"] = get_geoip_info( $_SERVER['REMOTE_ADDR'] ) ; 
