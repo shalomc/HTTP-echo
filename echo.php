@@ -15,7 +15,7 @@
   *
 **/
 
-$version = 1.9.1;
+$version = "1.9.1";
 
 require_once('./lib/GeoIP/GeoIP.php');
 
