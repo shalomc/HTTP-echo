@@ -52,7 +52,7 @@ Debugging Akamai connections to my server
     "meta": {
         "description": "HTTP echo service",
         "author": "Shalom Carmel 2016",
-        "version": "1.0"
+        "version": "1.9.1"
     },
     "request": {
         "timestamp": 1453377461,
@@ -89,8 +89,12 @@ Debugging Akamai connections to my server
 }
 ```
 ## Installation 
+### Simple installation
 Just drop everything into a folder on your web server. As simple as that.  
 Use composer to verify that you have the latest Mobile detect library. 
+
+### CloudFormation Installation
+The HttpEchoService.json file is an AWS CloudFormation template to start an EC2 server and automatically configure it to use the echo service.
 
 ## To do
 * Add Nginx support
