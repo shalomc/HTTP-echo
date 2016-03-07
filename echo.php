@@ -15,7 +15,7 @@
   *
 **/
 
-$version = "1.9.1";
+$version = "1.9.2";
 
 require_once('./lib/GeoIP/GeoIP.php');
 
@@ -81,6 +81,7 @@ if ($json) {
 	$response["meta"]["description"]='HTTP echo service';
 	$response["meta"]["author"]='Shalom Carmel 2016';
 	$response["meta"]["version"]=$version;
+	$response["meta"]["source"]="https://github.com/shalomc/HTTP-echo/";
 	$response["request"]["timestamp"]=$time;
 	$response["request"]["date"]=date('Y-m-d h:i:sO',$time);
 	$response["request"]["date"]=date('c',$time);
