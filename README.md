@@ -93,6 +93,14 @@ Debugging Akamai connections to my server
 Just drop everything into a folder on your web server. As simple as that.  
 Use composer to verify that you have the latest Mobile detect library. 
 
+### Installation from scratch
+Assuming you have a new AWS server, you need php 5.4 and Apache to run this tool. 
+
+The install.sh script in the setup folder installs all of the prerequisites, downloads the repository, and puts everything in place. 
+
+Modify it to remove parts that were done manually. 
+
+
 ### CloudFormation Installation
 The HttpEchoService.json file is an AWS CloudFormation template to start an EC2 server and automatically configure it to use the echo service.
 
