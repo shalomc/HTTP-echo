@@ -45,6 +45,21 @@ Alternatively, add a "x-echo-type=text" query string parameter - it is case sens
 
 ` curl "http://yourserver/somepath/somefile?somequerystring&x-echo-type=text" `
 
+###Support CDN True client IP headers
+When used behind a CDN, the IP address as seen by the script is not the client IP but the CDN IP. 
+
+You can add this line to the config file to use a specific HTTP header with the real client IP. In this case - it is configured for Fastly.
+
+` override-clientip=Fastly-Client-IP `
+
+Alternatively, add the "x-override-clientip" header.
+
+` curl "http://yourserver/somepath/somefile?somequerystring"  -H "x-override-clientip: Fastly-Client-IP" `
+
+Alternatively, add a "x-override-clientip=Fastly-Client-IP" query string parameter.
+
+` curl "http://yourserver/somepath/somefile?somequerystring&x-override-clientip=Fastly-Client-IP" `
+
 ## Example output 
 Debugging Akamai connections to my server 
 ```

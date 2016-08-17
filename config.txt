@@ -1,3 +1,4 @@
 
 response-type=json
 resolve-geoip=true
+override-clientip=Fastly-Client-IP

@@ -37,6 +37,7 @@ if (!defined("JSON_UNESCAPED_SLASHES")) {
  
  // Instruct browsers, proxies and CDN to not cache
  header('Cache-Control: private, no-cache'); 
+ 
  // Allow usage with AJAX 
  header('Access-Control-Allow-Origin: *'); 
 
@@ -72,12 +73,30 @@ if (file_exists('vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php')) {
 	$devicedetect = false;
 }
 
+// Override client ip to support CDN settings
+if ( empty($_SERVER['HTTP_X_OVERRIDE_CLIENTIP']) && empty($_GET['x-override-clientip'] ) && empty($configuration_array["override-clientip"])) {
+	$override_clientip=false; 
+} elseif (empty($configuration_array["override-clientip"]) == false ) {
+	$override_clientip = true;
+	$clientip_header=$configuration_array["override-clientip"]; 
+} elseif (empty($_SERVER['HTTP_X_OVERRIDE_CLIENTIP']) == false ) {
+	$override_clientip = true;
+	$clientip_header=$_SERVER['HTTP_X_OVERRIDE_CLIENTIP']; 
+} elseif (empty($_GET['x-override-clientip']) == false ) {
+	$override_clientip = true;
+	$clientip_header=$_GET['x-override-clientip'];
+} else {
+	$override_clientip = false;
+}
+
+
 
 if ($json) { 
 	header('Content-Type: application/json');
 	$response = array ();
 	date_default_timezone_set("UTC");
 	$time = time(); 
+    $headers = apache_request_headers();
 	$response["meta"]["description"]='HTTP echo service';
 	$response["meta"]["author"]='Shalom Carmel 2016';
 	$response["meta"]["version"]=$version;
@@ -88,7 +107,8 @@ if ($json) {
 	$response["request"]["server"]= $_SERVER["SERVER_NAME"] ;
 	$response["request"]["port"]= $_SERVER["SERVER_PORT"] ;
 	$response["request"]["protocol"]= $_SERVER["SERVER_PROTOCOL"] ;
-	$response["request"]["client_ip"]= $_SERVER["REMOTE_ADDR"] ;
+	$clientip = $override_clientip && !empty($headers[$clientip_header]) ? $headers[$clientip_header] : $_SERVER["REMOTE_ADDR"] ;
+	$response["request"]["client_ip"]= $clientip ;
 	$response["request"]["method"]= $_SERVER["REQUEST_METHOD"] ;
 	$response["request"]["uri"]= $_SERVER["REQUEST_URI"] ;
 	$response["request"]["path"]= parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH) ;
@@ -96,7 +116,6 @@ if ($json) {
 	$response["request"]["https"]= $_SERVER["HTTPS"] ;
 	$response["request"]["remote_user"]= $_SERVER["REMOTE_USER"] ;	
 	$response["request"]["params"]= $_GET ;		
-    $headers = apache_request_headers();
 	$response["headers"]= $headers; 
 	
     $HTTP_body = file_get_contents('php://input');
@@ -115,7 +134,8 @@ if ($json) {
 	
 	// geoip integration
 	if ($geoip) {
-		$response["geoip_info"] = get_geoip_info( $_SERVER['REMOTE_ADDR'] ) ; 
+		$ip_source=array("IP-source" => $override_clientip && !empty($headers[$clientip_header]) ? $clientip_header : "REMOTE_ADDR" ); 
+		$response["geoip_info"] = array_merge( $ip_source, get_geoip_info( $clientip ) ); 
 	}
 
 	// Device detection integration
