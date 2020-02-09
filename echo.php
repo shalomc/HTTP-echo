@@ -15,8 +15,13 @@
   *
 **/
 
-$version = "2.0.1";
-$author = 'Shalom Carmel 2016/2018';
+$version = "2.0.2";
+$author = 'Shalom Carmel 2016/2020';
+
+// General settings
+
+$TerryPratchetMemorial = true ; 
+
 
 require_once('./lib/GeoIP/GeoIP.php');
 
@@ -43,8 +48,9 @@ if (!defined("JSON_UNESCAPED_SLASHES")) {
  header('Access-Control-Allow-Origin: *'); 
 
  // Terry Pratchet Memorial 
- header('X-Clacks-Overhead: GNU Terry Pratchett'); 
-
+ if ($TerryPratchetMemorial) {
+	header('X-Clacks-Overhead: GNU Terry Pratchett'); 
+ }
  
  
 // Add LetsEncrypt automatic redirection. 
@@ -135,6 +141,10 @@ if ($json) {
 	$response["meta"]["author"]=$author;
 	$response["meta"]["version"]=$version;
 	$response["meta"]["source"]="https://github.com/shalomc/HTTP-echo/";
+	if ($TerryPratchetMemorial) {
+		$response["meta"]["clacks-overhead"]= "GNU Terry Pratchett"; 
+	 }
+ 
 	$response["request"]["timestamp"]=$time;
 	$response["request"]["date"]=date('Y-m-d h:i:sO',$time);
 	$response["request"]["date"]=date('c',$time);
