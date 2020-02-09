@@ -42,6 +42,9 @@ if (!defined("JSON_UNESCAPED_SLASHES")) {
  // Allow usage with AJAX 
  header('Access-Control-Allow-Origin: *'); 
 
+ // Terry Pratchet Memorial 
+ header('X-Clacks-Overhead: GNU Terry Pratchett'); 
+
  
  
 // Add LetsEncrypt automatic redirection. 
