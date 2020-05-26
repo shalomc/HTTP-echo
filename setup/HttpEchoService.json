@@ -201,7 +201,7 @@
               "/etc/httpd/conf.d/echo.conf" : {
                 "content" : { "Fn::Join" : [ "", [
 					"<VirtualHost *:80>\n", 
-					"	AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json\n", 
+					"   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json\n",
 					"   ServerSignature Off\n", 
 					"   DocumentRoot /var/www/html\n", 
 					"   <Directory \"/var/www/html\">\n",
