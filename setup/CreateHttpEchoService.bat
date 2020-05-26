@@ -12,9 +12,10 @@ rem        *********************************************************************
 set SSHKEY=someSSHkey
 set STACKNAME=echo
 set REGION=us-east-1
+set PROFILE=sandbox
 
 echo Stack being created...
-aws cloudformation create-stack --stack-name %STACKNAME% --region %REGION% --template-body file://HttpEchoService.json --parameters ParameterKey=KeyName,ParameterValue=%SSHKEY% --query "StackId" --output text  > @tmpfile
+aws cloudformation create-stack --profile %PROFILE% --stack-name %STACKNAME% --region %REGION% --template-body file://HttpEchoService.json --parameters ParameterKey=KeyName,ParameterValue=%SSHKEY% --query "StackId" --output text  > @tmpfile
 set /p STACKID=<@tmpFile
 del @tmpFile 
 ECHO Stack ID: %STACKID%

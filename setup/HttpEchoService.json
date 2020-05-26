@@ -12,19 +12,12 @@
     },    
 
     "InstanceType" : {
-      "Description" : "WebServer EC2 instance type *deprecated*",
+      "Description" : "WebServer EC2 instance type",
       "Type" : "String",
       "Default" : "t2.small",
-      "AllowedValues" : [ "t1.micro", "t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "g2.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"]
+      "AllowedValues" : [ "t1.micro", "t2.nano", "t2.micro", "t2.small", "t2.medium"]
 ,
       "ConstraintDescription" : "must be a valid EC2 instance type."
-    },
-
-    "AMI" : {
-      "Description" : "AMI to use",
-      "Type" : "String",
-      "Default" : "ami-0fc61db8544a617ed",
-      "ConstraintDescription" : "must be a valid AMI."
     },
 
     "SSHLocation" : {
@@ -38,7 +31,31 @@
     } 
   },
   
-  "Mappings" : {  },
+   "Mappings" : {
+     "AWSRegion2AMI" : {
+      "us-east-1"        : {"HVM64" : "ami-0fc61db8544a617ed"},
+      "us-west-2"        : {"HVM64" : "ami-0ce21b51cb31a48b8"},
+      "us-west-1"        : {"HVM64" : "ami-09a7fe78668f1e2c0"},
+      "eu-west-1"        : {"HVM64" : "ami-04d5cc9b88f9d1d39"},
+      "eu-west-2"        : {"HVM64" : "ami-0cb790308f7591fa6"},
+      "eu-west-3"        : {"HVM64" : "ami-07eda9385feb1e969"},
+      "eu-central-1"     : {"HVM64" : "ami-0ec1ba09723e5bfac"},
+      "eu-north-1"       : {"HVM64" : "ami-0f630db6194a81ad0"},
+      "ap-northeast-1"   : {"HVM64" : "ami-052652af12b58691f"},
+      "ap-northeast-2"   : {"HVM64" : "ami-0db78afd3d150fc18"},
+      "ap-northeast-3"   : {"HVM64" : "ami-075b14c8e2f90fd84"},
+      "ap-southeast-1"   : {"HVM64" : "ami-0cbc6aae997c6538a"},
+      "ap-southeast-2"   : {"HVM64" : "ami-08fdde86b93accf1c"},
+      "ap-south-1"       : {"HVM64" : "ami-03b5297d565ef30a6"},
+      "us-east-2"        : {"HVM64" : "ami-0e01ce4ee18447327"},
+      "ca-central-1"     : {"HVM64" : "ami-0bf54ac1b628cf143"},
+      "sa-east-1"        : {"HVM64" : "ami-0b032e878a66c3b68"},
+      "cn-north-1"       : {"HVM64" : "ami-075e747be97c43817"},
+      "cn-northwest-1"   : {"HVM64" : "ami-0e08e7c3821193844"},
+      "me-south-1"       : {"HVM64" : "ami-05613911cb72781b8"}
+    }
+
+  },
     
   "Resources" : {     
       
@@ -79,25 +96,6 @@
                 "owner"   : "root",
                 "group"   : "root"
               },
-              "/etc/httpd/conf.d/echo.conf" : {
-                "content" : { "Fn::Join" : [ "", [
-					"<VirtualHost *:80>\n",
-					"   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json\n",
-					"   ServerSignature Off\n",
-					"   DocumentRoot /var/www/html\n",
-					"   <Directory \"/var/www/html\">\n",
-					"      Options FollowSymLinks\n",
-					"      Order allow,deny\n",
-					"      Allow from all\n",
-					"      RewriteEngine on\n",
-					"      RewriteRule (.*) echo.php\n",
-					"   </Directory>\n",
-					"</VirtualHost>\n"
-                ]]},
-                "mode" : "000644",
-                "owner" : "root",
-                "group" : "root"
-              },
               "/root/setup_echo.sh" : {
                 "content" : { "Fn::Join" : ["", [
                           "#!/bin/bash\n",
@@ -107,6 +105,7 @@
                           "export COMPOSER_HOME=/root\n",
                           "cp -R /tmp/HTTP-echo-master/* /var/www/html/\n",
                           "yes | cp /tmp/HTTP-echo-master/.htaccess /var/www/html/\n",
+                          "cp /tmp/HTTP-echo-master/setup/echo.conf /etc/httpd/conf.d/\n",
                           "yes | rm /etc/httpd/conf.d/welcome.conf\n",
                           "cd /var/www/html/\n",
                           "composer\n",
@@ -139,7 +138,7 @@
             },
 
             "services" : {
-              "sysvinit" : {  
+              "sysvinit" : {
                 "httpd"   : { "enabled" : "true", "ensureRunning" : "true" },
                 "cfn-hup" : { "enabled" : "true", "ensureRunning" : "true",
                               "files" : ["/etc/cfn/cfn-hup.conf", "/etc/cfn/hooks.d/cfn-auto-reloader.conf"]}
@@ -161,7 +160,7 @@
         }
       },
       "Properties": {
-        "ImageId" : { "Ref" : "AMI" },
+        "ImageId" : { "Fn::FindInMap" : [ "AWSRegion2AMI", { "Ref" : "AWS::Region" }, "HVM64" ] },
         "InstanceType"   : { "Ref" : "InstanceType" },
         "SecurityGroups" : [ {"Ref" : "WebServerSecurityGroup"} ],
         "KeyName"        : { "Ref" : "KeyName" },
@@ -181,7 +180,7 @@
              "         --stack ", { "Ref" : "AWS::StackName" },
              "         --resource WebServerInstance ",
              "         --region ", { "Ref" : "AWS::Region" }, "\n"
-        ]]}}        
+        ]]}}
       },
       "CreationPolicy" : {
         "ResourceSignal" : {
@@ -189,27 +188,32 @@
         }
       }
     },
-    
+
     "WebServerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable HTTP access via port 80",
+        "GroupDescription" : "Enable HTTP access via ports 80, 443",
         "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0"},
           {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
           {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation"}}
         ]
-      }      
-    }          
+      }
+    }
   },
-  
+
   "Outputs" : {
     "BaseWebsiteURL" : {
-      "Description" : "Name for newly created web server",
+      "Description" : "URL for newly created echo server",
       "Value" : { "Fn::Join" : ["", ["http://", { "Fn::GetAtt" : [ "WebServerInstance", "PublicDnsName" ]}]] }
     },
-    "ConnectionStrings" : {
-      "Description" : "ssh conection strings",
+    "PuttyConnectionString" : {
+      "Description" : "putty conection string",
       "Value" : { "Fn::Join" : ["", ["putty -ssh -i \"c:\\dev\\keys\\" , { "Ref" : "KeyName" }, ".ppk\"", "  ec2-user@", { "Fn::GetAtt" : [ "WebServerInstance", "PublicDnsName" ]} ]] }
+    },
+    "sshConnectionString" : {
+      "Description" : "ssh conection string",
+      "Value" : { "Fn::Join" : ["", ["ssh -i ~/.ssh/" , { "Ref" : "KeyName" }, ".pem", "  ec2-user@", { "Fn::GetAtt" : [ "WebServerInstance", "PublicDnsName" ]} ]] }
     }
 
   }
