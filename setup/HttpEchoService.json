@@ -1,209 +1,90 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
-
-  "Description" : "Template HttpEchoService: Create an Amazon EC2 instance for the HTTP Echo Service. The AMI is chosen based on the region in which the stack is run. **WARNING** This template creates an Amazon EC2 instance. You will be billed for the AWS resources used if you create a stack from this template.",
-
+  
+  "Description" : "Template for an HTTP Echo server",
+  
   "Parameters" : {
-
+      
     "KeyName": {
-      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
       "Type": "AWS::EC2::KeyPair::KeyName",
       "ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
-    },
+    },    
 
     "InstanceType" : {
-      "Description" : "EchoServer EC2 instance type",
+      "Description" : "WebServer EC2 instance type *deprecated*",
       "Type" : "String",
-      "Default" : "m1.small",
-      "AllowedValues" : [ "t1.micro", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "g2.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"]
+      "Default" : "t2.small",
+      "AllowedValues" : [ "t1.micro", "t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "g2.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"]
 ,
       "ConstraintDescription" : "must be a valid EC2 instance type."
     },
 
-    "SSHLocation": {
-      "Description": "The IP address range that can be used to SSH to the EC2 instances",
+    "AMI" : {
+      "Description" : "AMI to use",
+      "Type" : "String",
+      "Default" : "ami-0fc61db8544a617ed",
+      "ConstraintDescription" : "must be a valid AMI."
+    },
+
+    "SSHLocation" : {
+      "Description" : " The IP address range that can be used to SSH to the EC2 instances",
       "Type": "String",
       "MinLength": "9",
       "MaxLength": "18",
       "Default": "0.0.0.0/0",
       "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
-    }
-
-
+    } 
   },
-
-  "Mappings" : {
-    "AWSInstanceType2Arch" : {
-      "t1.micro"    : { "Arch" : "PV64"   },
-      "t2.nano"     : { "Arch" : "HVM64"  },
-      "t2.micro"    : { "Arch" : "HVM64"  },
-      "t2.small"    : { "Arch" : "HVM64"  },
-      "t2.medium"   : { "Arch" : "HVM64"  },
-      "t2.large"    : { "Arch" : "HVM64"  },
-      "m1.small"    : { "Arch" : "PV64"   },
-      "m1.medium"   : { "Arch" : "PV64"   },
-      "m1.large"    : { "Arch" : "PV64"   },
-      "m1.xlarge"   : { "Arch" : "PV64"   },
-      "m2.xlarge"   : { "Arch" : "PV64"   },
-      "m2.2xlarge"  : { "Arch" : "PV64"   },
-      "m2.4xlarge"  : { "Arch" : "PV64"   },
-      "m3.medium"   : { "Arch" : "HVM64"  },
-      "m3.large"    : { "Arch" : "HVM64"  },
-      "m3.xlarge"   : { "Arch" : "HVM64"  },
-      "m3.2xlarge"  : { "Arch" : "HVM64"  },
-      "m4.large"    : { "Arch" : "HVM64"  },
-      "m4.xlarge"   : { "Arch" : "HVM64"  },
-      "m4.2xlarge"  : { "Arch" : "HVM64"  },
-      "m4.4xlarge"  : { "Arch" : "HVM64"  },
-      "m4.10xlarge" : { "Arch" : "HVM64"  },
-      "c1.medium"   : { "Arch" : "PV64"   },
-      "c1.xlarge"   : { "Arch" : "PV64"   },
-      "c3.large"    : { "Arch" : "HVM64"  },
-      "c3.xlarge"   : { "Arch" : "HVM64"  },
-      "c3.2xlarge"  : { "Arch" : "HVM64"  },
-      "c3.4xlarge"  : { "Arch" : "HVM64"  },
-      "c3.8xlarge"  : { "Arch" : "HVM64"  },
-      "c4.large"    : { "Arch" : "HVM64"  },
-      "c4.xlarge"   : { "Arch" : "HVM64"  },
-      "c4.2xlarge"  : { "Arch" : "HVM64"  },
-      "c4.4xlarge"  : { "Arch" : "HVM64"  },
-      "c4.8xlarge"  : { "Arch" : "HVM64"  },
-      "g2.2xlarge"  : { "Arch" : "HVMG2"  },
-      "g2.8xlarge"  : { "Arch" : "HVMG2"  },
-      "r3.large"    : { "Arch" : "HVM64"  },
-      "r3.xlarge"   : { "Arch" : "HVM64"  },
-      "r3.2xlarge"  : { "Arch" : "HVM64"  },
-      "r3.4xlarge"  : { "Arch" : "HVM64"  },
-      "r3.8xlarge"  : { "Arch" : "HVM64"  },
-      "i2.xlarge"   : { "Arch" : "HVM64"  },
-      "i2.2xlarge"  : { "Arch" : "HVM64"  },
-      "i2.4xlarge"  : { "Arch" : "HVM64"  },
-      "i2.8xlarge"  : { "Arch" : "HVM64"  },
-      "d2.xlarge"   : { "Arch" : "HVM64"  },
-      "d2.2xlarge"  : { "Arch" : "HVM64"  },
-      "d2.4xlarge"  : { "Arch" : "HVM64"  },
-      "d2.8xlarge"  : { "Arch" : "HVM64"  },
-      "hi1.4xlarge" : { "Arch" : "HVM64"  },
-      "hs1.8xlarge" : { "Arch" : "HVM64"  },
-      "cr1.8xlarge" : { "Arch" : "HVM64"  },
-      "cc2.8xlarge" : { "Arch" : "HVM64"  }
-    },
-
-    "AWSInstanceType2NATArch" : {
-      "t1.micro"    : { "Arch" : "NATPV64"   },
-      "t2.nano"     : { "Arch" : "NATHVM64"  },
-      "t2.micro"    : { "Arch" : "NATHVM64"  },
-      "t2.small"    : { "Arch" : "NATHVM64"  },
-      "t2.medium"   : { "Arch" : "NATHVM64"  },
-      "t2.large"    : { "Arch" : "NATHVM64"  },
-      "m1.small"    : { "Arch" : "NATPV64"   },
-      "m1.medium"   : { "Arch" : "NATPV64"   },
-      "m1.large"    : { "Arch" : "NATPV64"   },
-      "m1.xlarge"   : { "Arch" : "NATPV64"   },
-      "m2.xlarge"   : { "Arch" : "NATPV64"   },
-      "m2.2xlarge"  : { "Arch" : "NATPV64"   },
-      "m2.4xlarge"  : { "Arch" : "NATPV64"   },
-      "m3.medium"   : { "Arch" : "NATHVM64"  },
-      "m3.large"    : { "Arch" : "NATHVM64"  },
-      "m3.xlarge"   : { "Arch" : "NATHVM64"  },
-      "m3.2xlarge"  : { "Arch" : "NATHVM64"  },
-      "m4.large"    : { "Arch" : "NATHVM64"  },
-      "m4.xlarge"   : { "Arch" : "NATHVM64"  },
-      "m4.2xlarge"  : { "Arch" : "NATHVM64"  },
-      "m4.4xlarge"  : { "Arch" : "NATHVM64"  },
-      "m4.10xlarge" : { "Arch" : "NATHVM64"  },
-      "c1.medium"   : { "Arch" : "NATPV64"   },
-      "c1.xlarge"   : { "Arch" : "NATPV64"   },
-      "c3.large"    : { "Arch" : "NATHVM64"  },
-      "c3.xlarge"   : { "Arch" : "NATHVM64"  },
-      "c3.2xlarge"  : { "Arch" : "NATHVM64"  },
-      "c3.4xlarge"  : { "Arch" : "NATHVM64"  },
-      "c3.8xlarge"  : { "Arch" : "NATHVM64"  },
-      "c4.large"    : { "Arch" : "NATHVM64"  },
-      "c4.xlarge"   : { "Arch" : "NATHVM64"  },
-      "c4.2xlarge"  : { "Arch" : "NATHVM64"  },
-      "c4.4xlarge"  : { "Arch" : "NATHVM64"  },
-      "c4.8xlarge"  : { "Arch" : "NATHVM64"  },
-      "g2.2xlarge"  : { "Arch" : "NATHVMG2"  },
-      "g2.8xlarge"  : { "Arch" : "NATHVMG2"  },
-      "r3.large"    : { "Arch" : "NATHVM64"  },
-      "r3.xlarge"   : { "Arch" : "NATHVM64"  },
-      "r3.2xlarge"  : { "Arch" : "NATHVM64"  },
-      "r3.4xlarge"  : { "Arch" : "NATHVM64"  },
-      "r3.8xlarge"  : { "Arch" : "NATHVM64"  },
-      "i2.xlarge"   : { "Arch" : "NATHVM64"  },
-      "i2.2xlarge"  : { "Arch" : "NATHVM64"  },
-      "i2.4xlarge"  : { "Arch" : "NATHVM64"  },
-      "i2.8xlarge"  : { "Arch" : "NATHVM64"  },
-      "d2.xlarge"   : { "Arch" : "NATHVM64"  },
-      "d2.2xlarge"  : { "Arch" : "NATHVM64"  },
-      "d2.4xlarge"  : { "Arch" : "NATHVM64"  },
-      "d2.8xlarge"  : { "Arch" : "NATHVM64"  },
-      "hi1.4xlarge" : { "Arch" : "NATHVM64"  },
-      "hs1.8xlarge" : { "Arch" : "NATHVM64"  },
-      "cr1.8xlarge" : { "Arch" : "NATHVM64"  },
-      "cc2.8xlarge" : { "Arch" : "NATHVM64"  }
-    }
-,
-    "AWSRegionArch2AMI" : {
-      "us-east-1"        : {"PV64" : "ami-5fb8c835", "HVM64" : "ami-60b6c60a", "HVMG2" : "ami-e998ea83"},
-      "us-west-2"        : {"PV64" : "ami-d93622b8", "HVM64" : "ami-f0091d91", "HVMG2" : "ami-315f4850"},
-      "us-west-1"        : {"PV64" : "ami-56ea8636", "HVM64" : "ami-d5ea86b5", "HVMG2" : "ami-943956f4"},
-      "eu-west-1"        : {"PV64" : "ami-f9dd458a", "HVM64" : "ami-bff32ccc", "HVMG2" : "ami-83fd23f0"},
-      "eu-central-1"     : {"PV64" : "ami-794a5915", "HVM64" : "ami-bc5b48d0", "HVMG2" : "ami-ba1a09d6"},
-      "ap-northeast-1"   : {"PV64" : "ami-393c1957", "HVM64" : "ami-383c1956", "HVMG2" : "ami-08e5c166"},
-      "ap-northeast-2"   : {"PV64" : "NOT_SUPPORTED", "HVM64" : "ami-249b554a", "HVMG2" : "NOT_SUPPORTED"},
-      "ap-southeast-1"   : {"PV64" : "ami-34bd7a57", "HVM64" : "ami-c9b572aa", "HVMG2" : "ami-5a15d239"},
-      "ap-southeast-2"   : {"PV64" : "ami-ced887ad", "HVM64" : "ami-48d38c2b", "HVMG2" : "ami-0c1a446f"},
-      "sa-east-1"        : {"PV64" : "ami-7d15ad11", "HVM64" : "ami-6817af04", "HVMG2" : "NOT_SUPPORTED"},
-      "cn-north-1"       : {"PV64" : "ami-18ac6575", "HVM64" : "ami-43a36a2e", "HVMG2" : "NOT_SUPPORTED"}
-    }
-
-  },
-
-  "Resources" : {
-    "EchoServerSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "GroupDescription" : "Enable HTTP access via port 80 locked down to the load balancer + SSH access",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
-          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation"}}
-        ]
-      }
-    },
-
-    "EchoServer": {
-      "Type" : "AWS::EC2::Instance",
+  
+  "Mappings" : {  },
+    
+  "Resources" : {     
+      
+    "WebServerInstance": {  
+      "Type": "AWS::EC2::Instance",
       "Metadata" : {
         "AWS::CloudFormation::Init" : {
           "configSets" : {
-            "echo_service_install" : [ "install_echo_service" , "configure_echo_service"]
+            "InstallAndRun" : [ "Initialize", "Install", "Configure" ]
           },
-		  
-          "configure_echo_service" : {
+          "Initialize" : {
             "commands" : {
-              "01_configure_echo_service" : {
-                "command" : "/tmp/create_echo_service.sh",
-                "cwd" : "/tmp"
+              "00_enable_php7" : {
+                "command" : "amazon-linux-extras enable php7.2"
               }
+
             }
-          },			
-
-
-          "install_echo_service" : {
- 
+          },
+          "Install" : {
+            "packages" : {
+              "yum" : {
+                "httpd"        : [],
+                "php"          : []
+              }
+            },
             "sources" : {
               "/tmp" : "https://codeload.github.com/shalomc/HTTP-echo/zip/master"
             },
-           "files" : {
+
+            "files" : {
+              "/etc/cfn/cfn-hup.conf" : {
+                "content" : { "Fn::Join" : ["", [
+                  "[main]\n",
+                  "stack=", { "Ref" : "AWS::StackId" }, "\n",
+                  "region=", { "Ref" : "AWS::Region" }, "\n"
+                ]]},
+                "mode"    : "000400",
+                "owner"   : "root",
+                "group"   : "root"
+              },
               "/etc/httpd/conf.d/echo.conf" : {
                 "content" : { "Fn::Join" : [ "", [
-					"<VirtualHost *:80>\n", 
+					"<VirtualHost *:80>\n",
 					"   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json\n",
-					"   ServerSignature Off\n", 
-					"   DocumentRoot /var/www/html\n", 
+					"   ServerSignature Off\n",
+					"   DocumentRoot /var/www/html\n",
 					"   <Directory \"/var/www/html\">\n",
 					"      Options FollowSymLinks\n",
 					"      Order allow,deny\n",
@@ -216,67 +97,121 @@
                 "mode" : "000644",
                 "owner" : "root",
                 "group" : "root"
-              },	
+              },
+              "/root/setup_echo.sh" : {
+                "content" : { "Fn::Join" : ["", [
+                          "#!/bin/bash\n",
+                          "curl -sS https://getcomposer.org/installer | sudo php\n",
+                          "mv composer.phar /usr/bin/composer\n",
+                          "chmod +x /usr/bin/composer\n",
+                          "export COMPOSER_HOME=/root\n",
+                          "cp -R /tmp/HTTP-echo-master/* /var/www/html/\n",
+                          "yes | cp /tmp/HTTP-echo-master/.htaccess /var/www/html/\n",
+                          "yes | rm /etc/httpd/conf.d/welcome.conf\n",
+                          "cd /var/www/html/\n",
+                          "composer\n",
+                          "chmod -R 644 .\n",
+                          "chmod -R +x .\n",
+                          "service httpd restart\n"
 
-              "/tmp/create_echo_service.sh" : {
-                "content" : { "Fn::Join" : [ "", [
-				  "yum -y install php54\n", 
-                  "cp -R /tmp/HTTP-echo-master/* /var/www/html/\n",
-                  "yes | cp /tmp/HTTP-echo-master/.htaccess /var/www/html/\n",
-                  "yes | rm /etc/httpd/conf.d/welcome.conf\n",
-				  "service httpd restart\n"
                 ]]},
-                "mode" : "000500",
-                "owner" : "root",
-                "group" : "root"
+                "mode"    : "000700",
+                "owner"   : "root",
+                "group"   : "root"
+              },
+
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf" : {
+                "content": { "Fn::Join" : ["", [
+                  "[cfn-auto-reloader-hook]\n",
+                  "triggers=post.update\n",
+                  "path=Resources.WebServerInstance.Metadata.AWS::CloudFormation::Init\n",
+                  "action=/opt/aws/bin/cfn-init -v ",
+                  "         --stack ", { "Ref" : "AWS::StackName" },
+                  "         --resource WebServerInstance ",
+                  "         --configsets InstallAndRun ",
+                  "         --region ", { "Ref" : "AWS::Region" }, "\n",
+                  "runas=root\n"
+                ]]},
+                "mode"    : "000400",
+                "owner"   : "root",
+                "group"   : "root"
+              }
+            },
+
+            "services" : {
+              "sysvinit" : {  
+                "httpd"   : { "enabled" : "true", "ensureRunning" : "true" },
+                "cfn-hup" : { "enabled" : "true", "ensureRunning" : "true",
+                              "files" : ["/etc/cfn/cfn-hup.conf", "/etc/cfn/hooks.d/cfn-auto-reloader.conf"]}
+              }
+            }
+          },
+
+          "Configure" : {
+            "commands" : {
+              "00_enable_extra_packages" : {
+                "command" : "amazon-linux-extras enable php7.2"
+              },
+              "04_install_echo_for_php" : {
+                "command" : "/root/setup_echo.sh"
               }
 
-		  
             }
           }
         }
       },
       "Properties": {
-        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
+        "ImageId" : { "Ref" : "AMI" },
         "InstanceType"   : { "Ref" : "InstanceType" },
-        "SecurityGroups" : [ {"Ref" : "EchoServerSecurityGroup"} ],
+        "SecurityGroups" : [ {"Ref" : "WebServerSecurityGroup"} ],
         "KeyName"        : { "Ref" : "KeyName" },
-		"Tags" : [
-            {"Key" : "Name", "Value" : { "Ref" : "AWS::StackName" } }
-        ],
-        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
-                       "#!/bin/bash -xe", "\n",
-                       "yum update -y aws-cfn-bootstrap", "\n",
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+             "#!/bin/bash -xe\n",
+             "yum update -y aws-cfn-bootstrap\n",
 
-                       "/opt/aws/bin/cfn-init -v ",
-                       "         --stack ", { "Ref" : "AWS::StackName" },
-                       "         --resource EchoServer ",
-                       "         --configsets echo_service_install ",
-                       "         --region ", { "Ref" : "AWS::Region" }, "\n",
+             "# Install the files and packages from the metadata\n",
+             "/opt/aws/bin/cfn-init -v ",
+             "         --stack ", { "Ref" : "AWS::StackName" },
+             "         --resource WebServerInstance ",
+             "         --configsets InstallAndRun ",
+             "         --region ", { "Ref" : "AWS::Region" }, "\n",
 
-                       "/opt/aws/bin/cfn-signal -e $? ",
-                       "         --stack ", { "Ref" : "AWS::StackName" },
-                       "         --resource EchoServer ",
-                       "         --region ", { "Ref" : "AWS::Region" }, "\n" ,
-					   
-					   "/tmp/create_echo_service.sh", "\n"
-					   
-
-        ]]}}
+             "# Signal the status from cfn-init\n",
+             "/opt/aws/bin/cfn-signal -e $? ",
+             "         --stack ", { "Ref" : "AWS::StackName" },
+             "         --resource WebServerInstance ",
+             "         --region ", { "Ref" : "AWS::Region" }, "\n"
+        ]]}}        
       },
       "CreationPolicy" : {
         "ResourceSignal" : {
-          "Timeout" : "PT10M"
+          "Timeout" : "PT5M"
         }
       }
-    }
+    },
+    
+    "WebServerSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable HTTP access via port 80",
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation"}}
+        ]
+      }      
+    }          
   },
-
+  
   "Outputs" : {
-    "WebsiteURL" : {
-      "Value" : { "Fn::Join" : ["", ["http://", { "Fn::GetAtt" : [ "EchoServer", "PublicDnsName" ]}, "/" ]]},
-      "Description" : "echo_service Website"
+    "BaseWebsiteURL" : {
+      "Description" : "Name for newly created web server",
+      "Value" : { "Fn::Join" : ["", ["http://", { "Fn::GetAtt" : [ "WebServerInstance", "PublicDnsName" ]}]] }
+    },
+    "ConnectionStrings" : {
+      "Description" : "ssh conection strings",
+      "Value" : { "Fn::Join" : ["", ["putty -ssh -i \"c:\\dev\\keys\\" , { "Ref" : "KeyName" }, ".ppk\"", "  ec2-user@", { "Fn::GetAtt" : [ "WebServerInstance", "PublicDnsName" ]} ]] }
     }
+
   }
 }
+
