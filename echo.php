@@ -19,7 +19,7 @@
 // ini_set('display_errors', 1);
 // error_reporting(-1);
 
-$version = "2.0.2";
+$version = "2.0.3";
 $author = 'Shalom Carmel 2016/2020';
 
 // General settings
